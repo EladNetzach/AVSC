@@ -1,6 +1,7 @@
 mod model;
 mod parser;
 mod simulate;
+mod visualize;
 
 use std::env;
 use std::fs;
@@ -25,6 +26,7 @@ fn main() {
     println!("Inputs: {:?}", input_names);
     println!("Outputs: {:?}", output_names);
     println!("Gates: {:?}", module.gates);
+    visualize::print_gate_level(&module);
 
     // Generate all input combinations
     let n = module.input_ids.len();
