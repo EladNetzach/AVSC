@@ -11,10 +11,13 @@ use parser::parse_verilog;
 use simulate::simulate_module;
 
 fn main() {
-    // Get Verilog file from command line
     let args: Vec<String> = env::args().collect();
     if args.len() < 2 {
-        println!("Usage: {} <verilog_file>", args[0]);
+        println!("Usage: {} <verilog_file> [visual]", args[0]);
+        return;
+    }
+    if args.get(2).map(|s| s == "visual").unwrap_or(false) {
+        visualize::launch_visualization();
         return;
     }
     let filename = &args[1];
@@ -27,7 +30,6 @@ fn main() {
     println!("Outputs: {:?}", output_names);
     println!("Gates: {:?}", module.gates);
     visualize::print_gate_level(&module);
-
     // Generate all input combinations
     let n = module.input_ids.len();
     let num_combinations = 1 << n;
