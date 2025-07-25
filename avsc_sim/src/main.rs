@@ -2,7 +2,6 @@ mod model;
 mod parser;
 mod simulate;
 
-use std::collections::HashMap;
 use std::env;
 use std::fs;
 
@@ -21,35 +20,36 @@ fn main() {
     let source = fs::read_to_string(filename).expect("Failed to read file");
     let module: Module = parse_verilog(&source);
     println!("Parsed module: {}", module.name);
-    println!("Inputs: {:?}", module.inputs);
-    println!("Outputs: {:?}", module.outputs);
+    let input_names: Vec<_> = module.input_ids.iter().map(|&id| &module.signals[id].name).collect();
+    let output_names: Vec<_> = module.output_ids.iter().map(|&id| &module.signals[id].name).collect();
+    println!("Inputs: {:?}", input_names);
+    println!("Outputs: {:?}", output_names);
     println!("Gates: {:?}", module.gates);
 
     // Generate all input combinations
-    let n = module.inputs.len();
+    let n = module.input_ids.len();
     let num_combinations = 1 << n;
     println!("\nTruth Table:");
     // Print header
-    for input in &module.inputs {
-        print!("{} ", input);
+    for name in &input_names {
+        print!("{} ", name);
     }
     print!("| ");
-    for output in &module.outputs {
-        print!("{} ", output);
+    for name in &output_names {
+        print!("{} ", name);
     }
     println!();
     // Simulate for each combination
     for i in 0..num_combinations {
-        let mut input_values = HashMap::new();
-        for (j, input) in module.inputs.iter().enumerate() {
-            let val = (i >> (n - 1 - j)) & 1 == 1;
-            input_values.insert(input.clone(), val);
-            print!("{} ", val as u8);
+        let mut input_vec = vec![false; n];
+        for (j, _) in module.input_ids.iter().enumerate() {
+            input_vec[j] = (i >> (n - 1 - j)) & 1 == 1;
+            print!("{} ", input_vec[j] as u8);
         }
         print!("| ");
-        let outputs = simulate_module(&module, &input_values);
-        for output in &module.outputs {
-            print!("{} ", outputs.get(output).copied().unwrap_or(false) as u8);
+        let outputs = simulate_module(&module, &input_vec);
+        for &val in &outputs {
+            print!("{} ", val as u8);
         }
         println!();
     }
