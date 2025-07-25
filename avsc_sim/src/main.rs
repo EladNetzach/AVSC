@@ -5,7 +5,6 @@ mod simulate;
 use std::collections::HashMap;
 use std::env;
 use std::fs;
-use std::io::{self, Write};
 
 use model::Module;
 use parser::parse_verilog;
@@ -26,21 +25,32 @@ fn main() {
     println!("Outputs: {:?}", module.outputs);
     println!("Gates: {:?}", module.gates);
 
-    // Prompt for input values
-    let mut input_values = HashMap::new();
+    // Generate all input combinations
+    let n = module.inputs.len();
+    let num_combinations = 1 << n;
+    println!("\nTruth Table:");
+    // Print header
     for input in &module.inputs {
-        print!("Enter value for {} (0 or 1): ", input);
-        io::stdout().flush().unwrap();
-        let mut val = String::new();
-        io::stdin().read_line(&mut val).unwrap();
-        let v = val.trim() == "1";
-        input_values.insert(input.clone(), v);
+        print!("{} ", input);
     }
-
-    // Simulate
-    let outputs = simulate_module(&module, &input_values);
-    println!("\nSimulation Results:");
-    for (out, val) in outputs {
-        println!("  {} = {}", out, val as u8);
+    print!("| ");
+    for output in &module.outputs {
+        print!("{} ", output);
+    }
+    println!();
+    // Simulate for each combination
+    for i in 0..num_combinations {
+        let mut input_values = HashMap::new();
+        for (j, input) in module.inputs.iter().enumerate() {
+            let val = (i >> (n - 1 - j)) & 1 == 1;
+            input_values.insert(input.clone(), val);
+            print!("{} ", val as u8);
+        }
+        print!("| ");
+        let outputs = simulate_module(&module, &input_values);
+        for output in &module.outputs {
+            print!("{} ", outputs.get(output).copied().unwrap_or(false) as u8);
+        }
+        println!();
     }
 }
