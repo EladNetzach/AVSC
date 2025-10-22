@@ -1,0 +1,10 @@
+[package]
+name = "a_virtual_silicon_chip"
+version = "0.1.0"
+edition = "2021"
+
+description = "A Virtual Silicon Chip (AVSC): A simulation platform for digital ICs across abstraction layers."
+authors = ["Your Name <your.email@example.com>"]
+
+[dependencies]
+bevy = "0.13"

@@ -1,0 +1,11 @@
+[package]
+name = "avsc_sim"
+version = "0.1.0"
+edition = "2021"
+
+description = "A Virtual Silicon Chip Simulation Platform: Parse Verilog, simulate, and visualize all abstraction layers."
+authors = ["Your Name <your.email@example.com>"]
+
+[dependencies]
+regex = "1.10"
+bevy = "0.13"
